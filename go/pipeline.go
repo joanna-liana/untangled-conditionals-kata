@@ -10,7 +10,7 @@ func (p *Pipeline) run(project Project) {
 	var testsPassed bool
 	var deploySuccessful bool
 
-	testsPassed = runTests(project, p, testsPassed)
+	testsPassed = p.runTests(project, testsPassed)
 
 	if testsPassed {
 		if "success" == project.deploy() {
@@ -40,7 +40,7 @@ func (p *Pipeline) run(project Project) {
 	}
 }
 
-func runTests(project Project, p *Pipeline, testsPassed bool) bool {
+func (p *Pipeline) runTests(project Project, testsPassed bool) bool {
 	if project.hasTests() {
 		if "success" == project.runTests() {
 			p.log.info("Tests passed")
