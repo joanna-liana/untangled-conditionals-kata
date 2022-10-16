@@ -7,21 +7,8 @@ type Pipeline struct {
 }
 
 func (p *Pipeline) run(project Project) {
-	var deploySuccessful bool
-
 	testsPassed := p.runTests(project)
-
-	if testsPassed {
-		if "success" == project.deploy() {
-			p.log.info("Deployment successful")
-			deploySuccessful = true
-		} else {
-			p.log.error("Deployment failed")
-			deploySuccessful = false
-		}
-	} else {
-		deploySuccessful = false
-	}
+	deploySuccessful := p.deploy(testsPassed, project)
 
 	if p.config.sendEmailSummary() {
 		p.log.info("Sending email")
@@ -36,6 +23,20 @@ func (p *Pipeline) run(project Project) {
 		}
 	} else {
 		p.log.info("Email disabled")
+	}
+}
+
+func (p *Pipeline) deploy(testsPassed bool, project Project) (deploySuccessful bool) {
+	if !testsPassed {
+		return false
+	}
+
+	if project.deploy() == "success" {
+		p.log.info("Deployment successful")
+		return true
+	} else {
+		p.log.error("Deployment failed")
+		return false
 	}
 }
 
