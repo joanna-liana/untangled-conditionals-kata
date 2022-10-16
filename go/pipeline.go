@@ -8,7 +8,7 @@ type Pipeline struct {
 
 func (p *Pipeline) run(project Project) {
 	testsPassed := p.runTests(project)
-	deploySuccessful := p.deploy(testsPassed, project)
+	deploySuccessful := p.deploy(project, testsPassed)
 
 	if p.config.sendEmailSummary() {
 		p.log.info("Sending email")
@@ -26,7 +26,7 @@ func (p *Pipeline) run(project Project) {
 	}
 }
 
-func (p *Pipeline) deploy(testsPassed bool, project Project) (deploySuccessful bool) {
+func (p *Pipeline) deploy(project Project, testsPassed bool) (deploySuccessful bool) {
 	if !testsPassed {
 		return false
 	}
