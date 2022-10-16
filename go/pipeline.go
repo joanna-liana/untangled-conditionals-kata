@@ -10,20 +10,28 @@ func (p *Pipeline) run(project Project) {
 	testsPassed := p.runTests(project)
 	deploySuccessful := p.deploy(project, testsPassed)
 
-	if p.config.sendEmailSummary() {
-		p.log.info("Sending email")
-		if testsPassed {
-			if deploySuccessful {
-				p.emailer.send("Deployment completed successfully")
-			} else {
-				p.emailer.send("Deployment failed")
-			}
-		} else {
-			p.emailer.send("Tests failed")
-		}
-	} else {
+	p.sendEmailSummary(testsPassed, deploySuccessful)
+}
+
+func (p *Pipeline) sendEmailSummary(testsPassed bool, deploySuccessful bool) {
+	if !p.config.sendEmailSummary() {
 		p.log.info("Email disabled")
+		return
 	}
+
+	p.log.info("Sending email")
+
+	if !testsPassed {
+		p.emailer.send("Tests failed")
+		return
+	}
+
+	if !deploySuccessful {
+		p.emailer.send("Deployment failed")
+		return
+	}
+
+	p.emailer.send("Deployment completed successfully")
 }
 
 func (p *Pipeline) deploy(project Project, testsPassed bool) (deploySuccessful bool) {
