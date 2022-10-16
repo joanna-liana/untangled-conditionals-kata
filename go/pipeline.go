@@ -7,10 +7,9 @@ type Pipeline struct {
 }
 
 func (p *Pipeline) run(project Project) {
-	var testsPassed bool
 	var deploySuccessful bool
 
-	testsPassed = p.runTests(project)
+	testsPassed := p.runTests(project)
 
 	if testsPassed {
 		if "success" == project.deploy() {
